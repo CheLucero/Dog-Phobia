@@ -270,12 +270,12 @@ if time_point == 1:
     shuffle(prac_stimuli)
     
     instruct_text = ["Welcome to the experiment!\n\nToday you'll see a variety of words presented one at a time.\nSome of these words will be real, and some will be fake.\n\nYour job is to quickly and accurately hit a key to categorize\n each word as real or fake.\n",
-                     "If the word is a REAL word,\npress the %s button.\n\nIf the word is a FAKE word,\npress the %s button.\n\nIt's important that you are both fast and accurate." % (REAL_KEY, FAKE_KEY),
+                     "Keep your left index finger on the A key.\nKeep your right index finger on the ' key.\n\nIf the word is a REAL word,\npress the %s button with your right index finger.\n\nIf the word is a FAKE word,\npress the %s button with your left index finger.\n\nIt's important that you are both fast and accurate." % (REAL_KEY, FAKE_KEY),
                      "First, you will have a chance to practice a few.\n\nReady to start?"]
     instruct_text = [s + "\n\n\nPress SPACE to continue." for s in instruct_text]
     instructions = [InstructTrial(s) for s in instruct_text]
 
-    prac_over_text = ["Practice is now over.\nRemember to be as quick as you can while still being accurate."]
+    prac_over_text = ["Practice is now over.\n\nRemember to be as quick as you can while still being accurate."]
     prac_over_text = [s + "\n\n\nPress SPACE to continue." for s in prac_over_text]
     prac_over = [InstructTrial(s) for s in prac_over_text]
 
@@ -313,6 +313,8 @@ elif time_point == 2:
         else:
             quit('a modulo was not 0 or 1!')
         a ^= 1                              
+
+    shuffle(treatment_trials)
     
 # For T2, read from the original file and keep all prime/target pairings.
 # Combo_stimuli is shuffled for both T1 and T2 
