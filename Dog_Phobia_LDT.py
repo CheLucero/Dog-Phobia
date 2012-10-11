@@ -23,10 +23,6 @@ trial_index = 0
 
 SUBJECT = raw_input('Participant: ')
 time_point  = int(raw_input('Time (1/2): ')) 
-if time_point == 1:
-    exp_version = int(raw_input('Experiment Version (1/2): '))
-else:
-    exp_version = 'DUMMY'
 
 # initialize vision egg
 vision_egg = SimpleVisionEgg()
@@ -73,7 +69,6 @@ class ExpTrial(Trial):
                           'Subject'     : SUBJECT,
                           'Trial'       : trial_index,
                           'Time'        : 'T' + str(time_point), 
-                          'Exp_Version' : exp_version,
                           'Stim_Type' : target_type},
                       response = Response(label = 'press', limit = ('a', "'")),
                       on_keypress = True)]                    
@@ -101,7 +96,6 @@ class TreatmentTrial(Trial):
                           'Target'       : target._text,
                           'Subject'      : SUBJECT,
                           'Time'         : 'T' + str(time_point), 
-                          'Exp_Version'  : exp_version,
                           'Presentation' : 'Sequential'},
                       response = Response(label = 'press', limit = ('a', "'")),
                       on_keypress = True)]                    
@@ -127,7 +121,6 @@ class TreatmentTrial2(Trial):
                           'Target'       : target._text,
                           'Subject'      : SUBJECT,
                           'Time'         : 'T' + str(time_point), 
-                          'Exp_Version'  : exp_version,
                           'Presentation' : 'Sequential'},
                       response = Response(label = 'press', limit = ('a', "'")),
                       on_keypress = True)]                    
@@ -156,19 +149,10 @@ class InstructTrial(Trial):
 #####################
 # Turn the strings of stimuli into TextStim objects
 fixation = Text(text = "+", font_size = 55, **std_params)
+REAL_KEY    = "'"
+FAKE_KEY    = "A" 
 
-if time_point == 1:
-    if exp_version == 1:
-        REAL_KEY    = 'RED'
-        FAKE_KEY    = 'BLUE' 
-        exp_version = 'REAL_RED'
-    elif exp_version == 2:
-        REAL_KEY    = 'BLUE'
-        FAKE_KEY    = 'RED'
-        exp_version = 'REAL_BLUE'
-    else:
-        quit('Experiment version must be 1 or 2')    
-        
+if time_point == 1:        
     # For T1, we want to just load the stimuli and shuffle them before presentation.
     # stimuli.csv has 3 entries per row, the prime, target, and whether it's a phobia
     # neutral, or pseudo set.
@@ -178,7 +162,7 @@ if time_point == 1:
     neutral_target = []
     pseudo_prime   = []
     pseudo_target  = []
-    x = open('stim/stimuli.csv', "rt")
+    x = open('stim/stimuli.csv', "rU")
     reader = csv.DictReader(x)
     for row in reader:
         if row['Stim_Type'] == 'fear':
@@ -275,16 +259,6 @@ elif time_point == 2:
     x = open("results/T1_%s_1.csv" %(SUBJECT), "rt")
     reader = csv.DictReader(x)
     for row in reader:       
-        exp_version = row['Exp_Version'] # Python is intellectually disabled and can't manage
-        # to report if a variable is defined or not. So, we'll just define it with every row. 
-        if exp_version == 'REAL_RED':
-            REAL_KEY    = 'RED'
-            FAKE_KEY    = 'BLUE' 
-        elif exp_version == 'REAL_BLUE':
-            REAL_KEY    = 'BLUE'
-            FAKE_KEY    = 'RED'
-        else:
-            pass
         
         if row['Prime']:
             prime     = TextStim(row['Prime'])
