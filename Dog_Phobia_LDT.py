@@ -154,8 +154,43 @@ FAKE_KEY    = "A"
 
 if time_point == 1:        
     # For T1, we want to just load the stimuli and shuffle them before presentation.
-    # stimuli.csv has 3 entries per row, the prime, target, and whether it's a phobia
-    # neutral, or pseudo set.
+    # stimuli.csv has 3 entries per row, the prime, target, and whether it's a fear
+    # positive, neutral, or pseudo set.
+    # First, load the practice round with stims from T1_practice.csv
+    prac_neutral_prime  = []
+    prac_neutral_target = []
+    prac_pseudo_prime   = []
+    prac_pseudo_target  = []
+    x = open('stim/T1_practice.csv', "rU")
+    reader = csv.DictReader(x)
+    for row in reader:
+        if row['Stim_Type'] == 'neutral':
+            prac_neutral_prime.append(row['Prime'])    
+            prac_neutral_target.append(row['Target'])
+        elif row['Stim_Type'] == 'pseudo':
+            prac_pseudo_prime.append(row['Prime'])
+            prac_pseudo_target.append(row['Target'])
+        else:     
+            print 'Prime was ', row['Prime']      
+            print 'Target was ', row['Target']
+            print 'Type was ', row['Stim_Type'] 
+            print 'Error with above entry, did not match stim_type.'
+            quit()   
+
+    prac_neutral_prime_list  = [TextStim(i) for i in prac_neutral_prime]
+    prac_neutral_target_list = [TextStim(i) for i in prac_neutral_target]      
+    prac_pseudo_prime_list   = [TextStim(i) for i in prac_pseudo_prime]
+    prac_pseudo_target_list  = [TextStim(i) for i in prac_pseudo_target]
+
+    prac_neutral_stimuli = []
+    for i in range(len(prac_neutral_prime_list)):
+        prac_neutral_stimuli.append((prac_neutral_prime_list[i], prac_neutral_target_list[i], 'neutral'))
+
+    prac_pseudo_stimuli = []
+    for i in range(len(prac_pseudo_target_list)):
+        prac_pseudo_stimuli.append((prac_pseudo_prime_list[i], prac_pseudo_target_list[i], 'pseudo'))    
+
+    
     dog_prime      = []
     fear_target    = []
     positive_target= []
@@ -203,7 +238,9 @@ if time_point == 1:
     shuffle(pseudo_prime_list)
     
     # flat_list is used to pre-load the stimuli with vision_egg.set_stimuli
-    flat_list = dog_prime_list + fear_target_list + positive_target_list \
+    flat_list = prac_neutral_prime_list + prac_neutral_target_list \
+                + prac_pseudo_prime_list + prac_pseudo_target_list \
+                + dog_prime_list + fear_target_list + positive_target_list \
                 + neutral_prime_list + neutral_target_list \
                 + pseudo_prime_list + pseudo_target_list
     
@@ -220,24 +257,35 @@ if time_point == 1:
     
     neutral_stimuli = []
     for i in range(len(neutral_prime_list)):
-        neutral_stimuli.append( (neutral_prime_list[i], neutral_target_list[i], 'neutral') )
+        neutral_stimuli.append((neutral_prime_list[i], neutral_target_list[i], 'neutral'))
     
     pseudo_stimuli = []
     for i in range(len(pseudo_target_list)):
-        pseudo_stimuli.append( (pseudo_prime_list[i], pseudo_target_list[i], 'pseudo') )    
+        pseudo_stimuli.append((pseudo_prime_list[i], pseudo_target_list[i], 'pseudo'))    
     
     combo_stimuli = fear_stimuli + positive_stimuli + neutral_stimuli + pseudo_stimuli   
-    shuffle(combo_stimuli) # Shuffle the order of prime/target pair presentation for T1 and T2        
+    shuffle(combo_stimuli) # Shuffle the order of prime/target pair presentation for T1 and T2
     
-    instruct_text = ["Welcome to the experiment!\n\nToday you'll see a variety of words presented one at a time.\nSome of these words will be real, and some will be fake.\n\nYour job is to quickly and accurately hit a key to categorize\n each word as real or fake.\n", "If the word is a REAL word,\npress the %s button.\n\nIf the word is a FAKE word,\npress the %s button.\n\nIt's important that you are both fast and accurate." % (REAL_KEY, FAKE_KEY), "Ready to start?"]
+    prac_stimuli = prac_pseudo_stimuli + prac_neutral_stimuli
+    shuffle(prac_stimuli)
+    
+    instruct_text = ["Welcome to the experiment!\n\nToday you'll see a variety of words presented one at a time.\nSome of these words will be real, and some will be fake.\n\nYour job is to quickly and accurately hit a key to categorize\n each word as real or fake.\n",
+                     "If the word is a REAL word,\npress the %s button.\n\nIf the word is a FAKE word,\npress the %s button.\n\nIt's important that you are both fast and accurate." % (REAL_KEY, FAKE_KEY),
+                     "First, you will have a chance to practice a few.\n\nReady to start?"]
     instruct_text = [s + "\n\n\nPress SPACE to continue." for s in instruct_text]
     instructions = [InstructTrial(s) for s in instruct_text]
-    
-    trials = [ExpTrial(combo_stimuli[i][0], combo_stimuli[i][1], combo_stimuli[i][2]) for i in range(len(combo_stimuli))]     
-    all_trials = instructions + trials    
+
+    prac_over_text = ["Practice is now over.\nRemember to be as quick as you can while still being accurate."]
+    prac_over_text = [s + "\n\n\nPress SPACE to continue." for s in prac_over_text]
+    prac_over = [InstructTrial(s) for s in prac_over_text]
+
+    prac_trials = [ExpTrial(prac_stimuli[i][0], prac_stimuli[i][1], prac_stimuli[i][2]) for i in range(len(prac_stimuli))]
+    trials = [ExpTrial(combo_stimuli[i][0], combo_stimuli[i][1], combo_stimuli[i][2]) for i in range(len(combo_stimuli))]
+    all_trials = instructions + prac_trials + prac_over + trials
     
     exp_stimuli = [rest_screen, fixation, mask, blank] + \
-        [s.stim for s in instructions] + flat_list
+        [s.stim for s in instructions] + [s.stim for s in prac_over] \
+        + flat_list
     
 elif time_point == 2:        
 # Build the treatment task. Alternate between serial presentation
