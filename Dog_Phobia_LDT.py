@@ -55,24 +55,24 @@ class ExpTrial(Trial):
     """Here's a trial for this experiment. It accepts a
     prime TextStim, a target TextStim, and a targe_type string.
     """
-    def __init__(self, prime, target, target_type):
+    def __init__(self, prime, target, condition):
         global trial_index
         trial_index += 1
 
         events=[Event(blank, start = 0, duration = 1),
                 Event(fixation, start = 1, duration = .5),
-                Event(prime, start = 1.5, duration = 1.028),
-                Event(mask, start = 2.528, duration = 1.3),
-                Event(target, start = 3.828, duration = 5,
-#                Event(prime, start = 1.5, duration = .028),
-#                Event(mask, start = 1.528, duration = .3),
-#                Event(target, start = 1.828, duration = 5,
+#                Event(prime, start = 1.5, duration = 1.028),
+#                Event(mask, start = 2.528, duration = 1.3),
+#                Event(target, start = 3.828, duration = 5,
+                Event(prime, start = 1.5, duration = .028),
+                Event(mask, start = 1.528, duration = .3),
+                Event(target, start = 1.828, duration = 5,
                       log={'Prime'      : prime._text, # Text class has a _text attribute for original string supplied.
                           'Target'      : target._text,
                           'Subject'     : SUBJECT,
                           'Trial'       : trial_index,
                           'Time'        : 'T' + str(time_point), 
-                          'Stim_Type' : target_type},
+                          'Condition' : condition},
                       response = Response(label = 'press', limit = ('a', "'")),
                       on_keypress = True)]                    
 
@@ -85,14 +85,14 @@ class TreatmentTrial(Trial):
     def __init__(self, US, CS, target, gender):
         events=[Event(blank, start = 0, duration = 1),
                 Event(fixation, start = 1, duration = .5),
-                Event(US, start = 1.5, duration = 1.028),
-                Event(CS, start = 2.528, duration = 1.028),
-                Event(mask, start = 3.556, duration = .3),
-                Event(target, start = 3.856, duration = 5,
-#                Event(US, start = 1.5, duration = .028),
-#                Event(CS, start = 1.528, duration = .028),
-#                Event(mask, start = 1.556, duration = .3),
-#                Event(target, start = 1.856, duration = 5,
+#                Event(US, start = 1.5, duration = 1.028),
+#                Event(CS, start = 2.528, duration = 1.028),
+#                Event(mask, start = 3.556, duration = .3),
+#                Event(target, start = 3.856, duration = 5,
+                Event(US, start = 1.5, duration = .028),
+                Event(CS, start = 1.528, duration = .028),
+                Event(mask, start = 1.556, duration = .3),
+                Event(target, start = 1.856, duration = 5,
                       log={'US'          : US._text,
                           'CS'           : CS._text,
                           'Prime'        : None,
@@ -112,19 +112,19 @@ class TreatmentTrial2(Trial):
     def __init__(self, USCS, target, gender):
         events=[Event(blank, start = 0, duration = 1),
                 Event(fixation, start = 1, duration = .5),
-                Event(USCS, start = 1.5, duration = 1.028),
-                Event(mask, start = 2.528, duration = .3),
-                Event(target, start = 2.828, duration = 5,
-#                Event(USCS, start = 1.5, duration = .028),
-#                Event(mask, start = 1.528, duration = .3),
-#                Event(target, start = 1.828, duration = 5,
+#                Event(USCS, start = 1.5, duration = 1.028),
+#                Event(mask, start = 2.528, duration = .3),
+#                Event(target, start = 2.828, duration = 5,
+                Event(USCS, start = 1.5, duration = .028),
+                Event(mask, start = 1.528, duration = .3),
+                Event(target, start = 1.828, duration = 5,
                       log={'US'          : USCS._text.partition(' ')[0],
                           'CS'           : USCS._text.partition(' ')[2],
                           'Prime'        : None,
                           'Target'       : target._text,
                           'Subject'      : SUBJECT,
                           'Time'         : 'T' + str(time_point), 
-                          'Presentation' : 'Sequential'},
+                          'Presentation' : 'Simultaneous'},
                       response = Response(label = 'press', limit = ('a', "'")),
                       on_keypress = True)]                    
 
@@ -159,6 +159,7 @@ if time_point == 1:
     # For T1, we want to just load the stimuli and shuffle them before presentation.
     # stimuli.csv has 3 entries per row, the prime, target, and whether it's a fear
     # positive, neutral, or pseudo set.
+
     # First, load the practice round with stims from T1_practice.csv
     prac_neutral_prime  = []
     prac_neutral_target = []
@@ -167,17 +168,17 @@ if time_point == 1:
     x = open('stim/T1_practice.csv', "rU")
     reader = csv.DictReader(x)
     for row in reader:
-        if row['Stim_Type'] == 'neutral':
+        if row['Condition'] == 'prac.neutral':
             prac_neutral_prime.append(row['Prime'])    
             prac_neutral_target.append(row['Target'])
-        elif row['Stim_Type'] == 'pseudo':
+        elif row['Condition'] == 'prac.pseudo':
             prac_pseudo_prime.append(row['Prime'])
             prac_pseudo_target.append(row['Target'])
         else:     
             print 'Prime was ', row['Prime']      
             print 'Target was ', row['Target']
-            print 'Type was ', row['Stim_Type'] 
-            print 'Error with above entry, did not match stim_type.'
+            print 'Type was ', row['Condition'] 
+            print 'Error with above entry, did not match condition.'
             quit()   
 
     prac_neutral_prime_list  = [TextStim(i) for i in prac_neutral_prime]
@@ -187,45 +188,50 @@ if time_point == 1:
 
     prac_neutral_stimuli = []
     for i in range(len(prac_neutral_prime_list)):
-        prac_neutral_stimuli.append((prac_neutral_prime_list[i], prac_neutral_target_list[i], 'neutral'))
+        prac_neutral_stimuli.append((prac_neutral_prime_list[i], prac_neutral_target_list[i], 'prac.neutral'))
 
     prac_pseudo_stimuli = []
     for i in range(len(prac_pseudo_target_list)):
-        prac_pseudo_stimuli.append((prac_pseudo_prime_list[i], prac_pseudo_target_list[i], 'pseudo'))    
+        prac_pseudo_stimuli.append((prac_pseudo_prime_list[i], prac_pseudo_target_list[i], 'prac.pseudo'))    
 
     
-    dog_prime      = []
-    fear_target    = []
-    positive_target= []
-    neutral_prime  = []
-    neutral_target = []
-    pseudo_prime   = []
-    pseudo_target  = []
+    dog_prime       = []
+    fear_target     = []
+    positive_seen_target    = []
+    positive_unseen_target  = []
+    neutral_prime   = []
+    neutral_target  = []
+    pseudo_prime    = []
+    pseudo_target   = []
     x = open('stim/stimuli.csv', "rU")
     reader = csv.DictReader(x)
     for row in reader:
-        if row['Stim_Type'] == 'fear':
+        if row['Condition'] == 'fear':
             dog_prime.append(row['Prime'])    
             fear_target.append(row['Target'])
-        elif row['Stim_Type'] == 'positive':
+        elif row['Condition'] == 'positive.seen':
             dog_prime.append(row['Prime'])
-            positive_target.append(row['Target'])
-        elif row['Stim_Type'] == 'neutral':
+            positive_seen_target.append(row['Target'])
+        elif row['Condition'] == 'positive.unseen':
+            dog_prime.append(row['Prime'])
+            positive_unseen_target.append(row['Target'])
+        elif row['Condition'] == 'neutral':
             neutral_prime.append(row['Prime'])    
             neutral_target.append(row['Target'])
-        elif row['Stim_Type'] == 'pseudo':
+        elif row['Condition'] == 'pseudo':
             pseudo_prime.append(row['Prime'])
             pseudo_target.append(row['Target'])
         else:     
             print 'Prime was ', row['Prime']      
             print 'Target was ', row['Target']
-            print 'Type was ', row['Stim_Type'] 
-            print 'Error with above entry, did not match stim_type.'
+            print 'Type was ', row['Condition'] 
+            print 'Error with above entry, did not match condition.'
             quit()   
 
     dog_prime_list      = [TextStim(i) for i in dog_prime]
     fear_target_list    = [TextStim(i) for i in fear_target]
-    positive_target_list= [TextStim(i) for i in positive_target]
+    positive_seen_target_list   = [TextStim(i) for i in positive_seen_target]
+    positive_unseen_target_list = [TextStim(i) for i in positive_unseen_target]
     neutral_prime_list  = [TextStim(i) for i in neutral_prime]
     neutral_target_list = [TextStim(i) for i in neutral_target]      
     pseudo_prime_list   = [TextStim(i) for i in pseudo_prime]
@@ -236,27 +242,34 @@ if time_point == 1:
     # and the prime/target pair are hand-picked.
     shuffle(dog_prime_list)
     shuffle(fear_target_list)    
-    shuffle(positive_target_list)
+    shuffle(positive_seen_target_list)
+    shuffle(positive_unseen_target_list)
     shuffle(pseudo_target_list)
     shuffle(pseudo_prime_list)
     
     # flat_list is used to pre-load the stimuli with vision_egg.set_stimuli
     flat_list = prac_neutral_prime_list + prac_neutral_target_list \
                 + prac_pseudo_prime_list + prac_pseudo_target_list \
-                + dog_prime_list + fear_target_list + positive_target_list \
+                + dog_prime_list + fear_target_list \
+                + positive_seen_target_list + positive_unseen_target_list \
                 + neutral_prime_list + neutral_target_list \
                 + pseudo_prime_list + pseudo_target_list
     
     # For fear and positive stims, we are splitting the shuffled list of primes
-    # called dog_prime_list and assigning 1/2 of each of it to either be fear
-    # or positive targets.
+    # called dog_prime_list and assigning 1/2 of it to the fear condition.
+    # The remaining half we split in two and assign to the positive.seen and
+    # positive.unseen conditions.
     fear_stimuli = []
     for i in range(len(dog_prime_list)/2):
         fear_stimuli.append((dog_prime_list[i], fear_target_list[i], 'fear'))
 
-    positive_stimuli = []
-    for i in range(len(dog_prime_list)/2):
-        positive_stimuli.append((dog_prime_list[i + len(dog_prime_list)/2], positive_target_list[i], 'positive'))
+    positive_seen_stimuli = []
+    for i in range(len(dog_prime_list)/4):
+        positive_seen_stimuli.append((dog_prime_list[i + len(dog_prime_list)/2], positive_seen_target_list[i], 'positive.seen'))
+
+    positive_unseen_stimuli = []
+    for i in range(len(dog_prime_list)/4):
+        positive_unseen_stimuli.append((dog_prime_list[i + (len(dog_prime_list)/4 * 3)], positive_unseen_target_list[i], 'positive.unseen'))
     
     neutral_stimuli = []
     for i in range(len(neutral_prime_list)):
@@ -266,7 +279,8 @@ if time_point == 1:
     for i in range(len(pseudo_target_list)):
         pseudo_stimuli.append((pseudo_prime_list[i], pseudo_target_list[i], 'pseudo'))    
     
-    combo_stimuli = fear_stimuli + positive_stimuli + neutral_stimuli + pseudo_stimuli   
+    combo_stimuli = fear_stimuli + positive_seen_stimuli + positive_unseen_stimuli \
+                    + neutral_stimuli + pseudo_stimuli   
     shuffle(combo_stimuli) # Shuffle the order of prime/target pair presentation for T1 and T2
     
     prac_stimuli = prac_pseudo_stimuli + prac_neutral_stimuli
@@ -324,14 +338,15 @@ elif time_point == 2:
     combo_stimuli = []         
     x = open("results/T1_%s_1.csv" %(SUBJECT), "rU")
     reader = csv.DictReader(x)
-    for row in reader:       
-        
-        if row['Prime']:
+    for row in reader:
+        if (row['Prime']) \
+        and (row['Condition'] != 'prac.neutral') \
+        and (row['Condition'] != 'prac.pseudo'):
             prime     = TextStim(row['Prime'])
             target    = TextStim(row['Target'])
-            stimtype  = row['Stim_Type']
+            condition  = row['Condition']
             flat_list += [prime, target] # for set_stimuli
-            combo_stimuli.append((prime, target, stimtype))
+            combo_stimuli.append((prime, target, condition))
 
     shuffle(combo_stimuli) # Shuffle the order of prime/target pair presentation for T1 and T2        
     trials = [ExpTrial(combo_stimuli[i][0], combo_stimuli[i][1], combo_stimuli[i][2]) for i in range(len(combo_stimuli))]
