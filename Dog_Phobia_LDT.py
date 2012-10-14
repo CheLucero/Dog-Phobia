@@ -145,7 +145,6 @@ class InstructTrial(Trial):
                 response = Response(label = 'instruct', limit = 'space'))]
                 #response = Response(label = None, limit = 'space'))]
         Trial.__init__(self, events)
-
         
 #####################
 # Set up the trials #
