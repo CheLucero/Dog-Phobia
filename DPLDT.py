@@ -21,8 +21,9 @@ from SimpleVisionEgg import *
 
 trial_index = 0
 
+
 SUBJECT = raw_input('Participant: ')
-time_point  = int(raw_input('Time (1/2): ')) 
+time_point  = int(raw_input('Time (1/2/3/4): ')) 
 
 # initialize vision egg
 vision_egg = SimpleVisionEgg()
@@ -151,7 +152,7 @@ class InstructTrial(Trial):
 #####################
 # Turn the strings of stimuli into TextStim objects
 fixation = Text(text = "+", font_size = 55, **std_params)
-REAL_KEY    = "'"
+REAL_KEY    = '"'
 FAKE_KEY    = "A" 
 
 if time_point == 1:        
@@ -286,7 +287,8 @@ if time_point == 1:
     shuffle(prac_stimuli)
     
     instruct_text = ["Welcome to the experiment!\n\nToday you'll see a variety of words presented one at a time.\nSome of these words will be real, and some will be fake.\n\nYour job is to quickly and accurately hit a key to categorize\n each word as real or fake.\n",
-                     "Keep your left index finger on the A key.\nKeep your right index finger on the ' key.\n\nIf the word is a REAL word,\npress the %s button with your right index finger.\n\nIf the word is a FAKE word,\npress the %s button with your left index finger.\n\nIt's important that you are both fast and accurate." % (REAL_KEY, FAKE_KEY),
+                     "Put your left index finger on the %s key.\nPut your right index finger on the %s key.\n\nIf the word is a REAL word,\npress the %s button with your right index finger.\n\nIf the word is a FAKE word,\npress the %s button with your left index finger.\n\nIt's important that you are both fast and accurate." % (FAKE_KEY, REAL_KEY, REAL_KEY, FAKE_KEY),
+                     "Real word:  %s\n\nFake word: %s" % (REAL_KEY, FAKE_KEY),
                      "First, you will have a chance to practice a few.\n\nReady to start?"]
     instruct_text = [s + "\n\n\nPress SPACE to continue." for s in instruct_text]
     instructions = [InstructTrial(s) for s in instruct_text]
@@ -303,7 +305,7 @@ if time_point == 1:
         [s.stim for s in instructions] + [s.stim for s in prac_over] \
         + flat_list
     
-elif time_point == 2:        
+elif time_point >= 2:        
 # Build the treatment task. Alternate between serial presentation
 # and side-by-side presentation.
     flat_list = [] # gather all stimuli to feed set_stimuli
@@ -349,13 +351,19 @@ elif time_point == 2:
 
     shuffle(combo_stimuli) # Shuffle the order of prime/target pair presentation for T1 and T2        
     trials = [ExpTrial(combo_stimuli[i][0], combo_stimuli[i][1], combo_stimuli[i][2]) for i in range(len(combo_stimuli))]
-        
-        
-    instruct_text = ["Welcome back to the experiment!\n\nToday you'll see a variety of names presented one at a time.\nSome of these will be a boy's name, and some will be a girl's name.\n\nYour job is to quickly and accurately hit a key to categorize\n each name as a boy's name or girl's name.\n", "If the name is a boy's name,\npress the %s button.\n\nIf the word is a girl's name,\npress the %s button.\n\nIt's important that you are both fast and accurate." % (REAL_KEY, FAKE_KEY), "Ready to start?"]
+                
+    instruct_text = ["Welcome to the next section of the experiment.\n\nToday you'll see a variety of names presented one at a time.\nSome of these will be a boy's name, and some will be a girl's name.\n\nYour job is to quickly and accurately hit a key to categorize\n each name as a boy's name or girl's name.\n",
+                     "Put your left index finger on the %s key.\nPut your right index finger on the %s key.\n\nIf the name is a BOY's name,\npress the %s button with your right index finger.\n\nIf the word is a GIRL's name,\npress the %s button with your left index finger.\n\nIt's important that you are both fast and accurate." % (FAKE_KEY, REAL_KEY, REAL_KEY, FAKE_KEY),
+                     "Boy's name:  %s\n\nGirl's name: %s" % (REAL_KEY, FAKE_KEY),
+                     "Ready to start?"]
     instruct_text = [s + "\n\n\nPress SPACE to continue." for s in instruct_text]
     instructions = [InstructTrial(s) for s in instruct_text]
-        
-    instruct_text2 = ["You have completed the first task!\n\nNext you'll see a variety of words presented one at a time.\nSome of these words will be real, and some will be fake.\n\nYour job is to quickly and accurately hit a key to categorize\n each word as real or fake.\n", "If the word is a REAL word,\npress the %s button.\n\nIf the word is a FAKE word,\npress the %s button.\n\nIt's important that you are both fast and accurate." % (REAL_KEY, FAKE_KEY), "Ready to start?"]
+
+
+    instruct_text2 = ["Task complete.\n\nNext, you'll see a variety of words presented one at a time.\nSome of these words will be real, and some will be fake.\n\nYour job is to quickly and accurately hit a key to categorize\n each word as real or fake.\n",
+                     "Put your left index finger on the %s key.\nPut your right index finger on the %s key.\n\nIf the word is a REAL word,\npress the %s button with your right index finger.\n\nIf the word is a FAKE word,\npress the %s button with your left index finger.\n\nIt's important that you are both fast and accurate." % (FAKE_KEY, REAL_KEY, REAL_KEY, FAKE_KEY),
+                     "Real word:  %s\n\nFake word: %s" % (REAL_KEY, FAKE_KEY),
+                     "Ready to start?"]
     instruct_text2 = [s + "\n\n\nPress SPACE to continue." for s in instruct_text2]
     instructions2 = [InstructTrial(s) for s in instruct_text2]              
         
@@ -365,7 +373,7 @@ elif time_point == 2:
         [s.stim for s in instructions] + [s.stim for s in instructions2] + flat_list
                 
 else:
-    quit('Time must be 1 or 2')    
+    quit('Time must be 1, 2, 3, 4')    
 
 ###############
 # Run the exp #
@@ -377,6 +385,6 @@ stim_control.run_trials(len(all_trials))
 if time_point == 1:
     stim_control.writelog(stim_control.getOutputFilename('results/T1_' + str(SUBJECT), 'DP_LDT'))
 else:
-    stim_control.writelog(stim_control.getOutputFilename('results/T2_' + str(SUBJECT), 'DP_LDT'))
+    stim_control.writelog(stim_control.getOutputFilename('results/T' + str(time_point) + '_' + str(SUBJECT), 'DP_LDT'))
     
-print '\n\n\n\n\n\t\tThank you for participating!\n\n\n\n\n'
+print '\n\n\n\n\n\t\tThis section is complete. Please inform the experimenter.\n\n\n\n\n'
