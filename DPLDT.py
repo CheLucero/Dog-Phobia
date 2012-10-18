@@ -5,8 +5,9 @@ Ss do 2 blocks of trials. In one, they approach things with a left-handed
 button press. In the other block, approach things with a right-handed 
 button press. Counterbalanced order.
 """
-STIM_DIRECTORY = '/Users/sway/Documents/Dropbox/Eugene Lang/Research/Casasanto Lab/VisionEgg/cognac/stim/'
+
 SVE_DIRECTORY = '/Users/sway/Documents/Dropbox/Eugene Lang/Research/Casasanto Lab/VisionEgg/'
+SVE_DIRECTORY = '/Users/Daniel_Casasanto/Documents/Scripts/cognac/'
 
 import sys       
 import csv
@@ -74,7 +75,7 @@ class ExpTrial(Trial):
                           'Trial'       : trial_index,
                           'Time'        : 'T' + str(time_point), 
                           'Condition' : condition},
-                      response = Response(label = 'press', limit = ('a', "'")),
+                      response = Response(label = 'press', limit = ('z', "/")),
                       on_keypress = True)]                    
 
         Trial.__init__(self,events)  
@@ -101,7 +102,7 @@ class TreatmentTrial(Trial):
                           'Subject'      : SUBJECT,
                           'Time'         : 'T' + str(time_point), 
                           'Presentation' : 'Sequential'},
-                      response = Response(label = 'press', limit = ('a', "'")),
+                      response = Response(label = 'press', limit = ('z', "/")),
                       on_keypress = True)]                    
 
         Trial.__init__(self,events)
@@ -126,7 +127,7 @@ class TreatmentTrial2(Trial):
                           'Subject'      : SUBJECT,
                           'Time'         : 'T' + str(time_point), 
                           'Presentation' : 'Simultaneous'},
-                      response = Response(label = 'press', limit = ('a', "'")),
+                      response = Response(label = 'press', limit = ('z', "/")),
                       on_keypress = True)]                    
 
         Trial.__init__(self,events)
@@ -143,8 +144,7 @@ class InstructTrial(Trial):
         events = [Event(blank, start = 0, duration = .3), 
             Event(self.stim, start = .3, duration = 1000, 
                 on_keypress = True,  # end the event with a keypress
-                response = Response(label = 'instruct', limit = 'space'))]
-                #response = Response(label = None, limit = 'space'))]
+                response = Response(label = 'instruct', limit = 'space'))]                
         Trial.__init__(self, events)
         
 #####################
@@ -152,8 +152,8 @@ class InstructTrial(Trial):
 #####################
 # Turn the strings of stimuli into TextStim objects
 fixation = Text(text = "+", font_size = 55, **std_params)
-REAL_KEY    = '"'
-FAKE_KEY    = "A" 
+REAL_KEY    = '?'
+FAKE_KEY    = "Z" 
 
 if time_point == 1:        
     # For T1, we want to just load the stimuli and shuffle them before presentation.
@@ -287,14 +287,15 @@ if time_point == 1:
     shuffle(prac_stimuli)
     
     instruct_text = ["Welcome to the experiment!\n\nToday you'll see a variety of words presented one at a time.\nSome of these words will be real, and some will be fake.\n\nYour job is to quickly and accurately hit a key to categorize\n each word as real or fake.\n",
-                     "Put your left index finger on the %s key.\nPut your right index finger on the %s key.\n\nIf the word is a REAL word,\npress the %s button with your right index finger.\n\nIf the word is a FAKE word,\npress the %s button with your left index finger.\n\nIt's important that you are both fast and accurate." % (FAKE_KEY, REAL_KEY, REAL_KEY, FAKE_KEY),
+                     "Put your left index finger on the %s key.\nPut your right index finger on the %s key." % (FAKE_KEY, REAL_KEY),
+                     "If the word is a REAL word,\npress the %s button with your right index finger.\n\nIf the word is a FAKE word,\npress the %s button with your left index finger.\n\nIt's important that you are both fast and accurate." % (REAL_KEY, FAKE_KEY),
                      "Real word:  %s\n\nFake word: %s" % (REAL_KEY, FAKE_KEY),
                      "First, you will have a chance to practice a few.\n\nReady to start?"]
-    instruct_text = [s + "\n\n\nPress SPACE to continue." for s in instruct_text]
+    instruct_text = [s + "\n\nPress SPACE to continue." for s in instruct_text]
     instructions = [InstructTrial(s) for s in instruct_text]
 
     prac_over_text = ["Practice is now over.\n\nRemember to be as quick as you can while still being accurate."]
-    prac_over_text = [s + "\n\n\nPress SPACE to continue." for s in prac_over_text]
+    prac_over_text = [s + "\n\nPress SPACE to continue." for s in prac_over_text]
     prac_over = [InstructTrial(s) for s in prac_over_text]
 
     prac_trials = [ExpTrial(prac_stimuli[i][0], prac_stimuli[i][1], prac_stimuli[i][2]) for i in range(len(prac_stimuli))]
@@ -353,18 +354,20 @@ elif time_point >= 2:
     trials = [ExpTrial(combo_stimuli[i][0], combo_stimuli[i][1], combo_stimuli[i][2]) for i in range(len(combo_stimuli))]
                 
     instruct_text = ["Welcome to the next section of the experiment.\n\nToday you'll see a variety of names presented one at a time.\nSome of these will be a boy's name, and some will be a girl's name.\n\nYour job is to quickly and accurately hit a key to categorize\n each name as a boy's name or girl's name.\n",
-                     "Put your left index finger on the %s key.\nPut your right index finger on the %s key.\n\nIf the name is a BOY's name,\npress the %s button with your right index finger.\n\nIf the word is a GIRL's name,\npress the %s button with your left index finger.\n\nIt's important that you are both fast and accurate." % (FAKE_KEY, REAL_KEY, REAL_KEY, FAKE_KEY),
+                     "Put your left index finger on the %s key.\nPut your right index finger on the %s key." % (FAKE_KEY, REAL_KEY),
+                     "If the name is a BOY's name,\npress the %s button with your right index finger.\n\nIf the word is a GIRL's name,\npress the %s button with your left index finger.\n\nIt's important that you are both fast and accurate." % (REAL_KEY, FAKE_KEY),
                      "Boy's name:  %s\n\nGirl's name: %s" % (REAL_KEY, FAKE_KEY),
                      "Ready to start?"]
-    instruct_text = [s + "\n\n\nPress SPACE to continue." for s in instruct_text]
+    instruct_text = [s + "\n\nPress SPACE to continue." for s in instruct_text]
     instructions = [InstructTrial(s) for s in instruct_text]
 
 
     instruct_text2 = ["Task complete.\n\nNext, you'll see a variety of words presented one at a time.\nSome of these words will be real, and some will be fake.\n\nYour job is to quickly and accurately hit a key to categorize\n each word as real or fake.\n",
-                     "Put your left index finger on the %s key.\nPut your right index finger on the %s key.\n\nIf the word is a REAL word,\npress the %s button with your right index finger.\n\nIf the word is a FAKE word,\npress the %s button with your left index finger.\n\nIt's important that you are both fast and accurate." % (FAKE_KEY, REAL_KEY, REAL_KEY, FAKE_KEY),
+                     "Put your left index finger on the %s key.\nPut your right index finger on the %s key." % (FAKE_KEY, REAL_KEY),
+                     "If the word is a REAL word,\npress the %s button with your right index finger.\n\nIf the word is a FAKE word,\npress the %s button with your left index finger.\n\nIt's important that you are both fast and accurate." % (REAL_KEY, FAKE_KEY),
                      "Real word:  %s\n\nFake word: %s" % (REAL_KEY, FAKE_KEY),
                      "Ready to start?"]
-    instruct_text2 = [s + "\n\n\nPress SPACE to continue." for s in instruct_text2]
+    instruct_text2 = [s + "\n\nPress SPACE to continue." for s in instruct_text2]
     instructions2 = [InstructTrial(s) for s in instruct_text2]              
         
     all_trials = instructions + treatment_trials + instructions2 + trials        
